@@ -1,44 +1,85 @@
-function abrirMenu() {
-    document.getElementById('menu').style.width = '250px';
-    document.getElementById('conteudo').style.marginLeft = '255px';
-}
-function fecharMenu() {
-  document.getElementById('menu').style.width = '0px';
-  document.getElementById('conteudo').style.marginLeft = '0px';
-}
-window.addEventListener("scroll", function(){
-  let header = document.querySelector('#header')
-  header.classList.toggle('rolagem',window.scrollY > 0)
-}) 
-  window.onscroll = function() {
-  var scrollTopButton = document.getElementById("scrollTopButton");
-  if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-      scrollTopButton.style.display = "block";
-  } else {
-      scrollTopButton.style.display = "none";
+let count = 1;
+document.getElementById("radio-1").checked = true;
+
+let interval = setInterval(nextImage, 3300);
+
+function nextImage(){
+  count++;
+  if (count > 5){
+    count = 1;
   }
-};
-
-// Função para rolar para o topo da página
-function scrollToTop() {
-  window.scrollTo({top: 0, behavior: 'smooth'});
+  document.getElementById("radio-" + count).checked = true;
+  atualizarBolinhasAtivas();
 }
-  //carrosel
-var radio = document.querySelector('.manual-btn') 
-var cont = 1
 
-document.getElementById('radio1').checked = true
+// Atualizar o count quando clicar nos botões manuais
+const radios = document.querySelectorAll('input[name="radio-btn"]');
+const manualBtns = document.querySelectorAll('.manual-navegação .manual-btn');
 
-setInterval(() => {
-    proximaImg()
-}, 5000)
+radios.forEach((radio, index) => {
+  radio.addEventListener('click', () => {
+    count = index + 1;
+    atualizarBolinhasAtivas();
+    clearInterval(interval);
+    interval = setInterval(nextImage, 3300); // reinicia o intervalo após clique manual
+  });
+});
 
-function proximaImg(){
-  cont++
-
-  if(cont > 3){
-    cont = 1
-  }
-
-  document.getElementById('radio' + cont).checked = true
+// Atualiza a aparência das bolinhas manuais
+function atualizarBolinhasAtivas() {
+  manualBtns.forEach((btn, i) => {
+    if (i === count - 1) {
+      btn.style.backgroundColor = "#ff6300";
+    } else {
+      btn.style.backgroundColor = "transparent";
+    }
+  });
 }
+
+// Atualiza a bolinha correta ao carregar
+atualizarBolinhasAtivas();
+
+//js recomendados
+const groups = document.querySelectorAll('.group');
+let currentGroup = 0;
+
+// Botão Anterior
+document.getElementById('prevBtn').addEventListener('click', () => {
+  groups[currentGroup].classList.remove('active');
+  currentGroup = (currentGroup - 1 + groups.length) % groups.length;
+  groups[currentGroup].classList.add('active');
+});
+
+// Botão Próximo
+document.getElementById('nextBtn').addEventListener('click', () => {
+  groups[currentGroup].classList.remove('active');
+  currentGroup = (currentGroup + 1) % groups.length;
+  groups[currentGroup].classList.add('active');
+});
+
+// Remove classe 'default-active' ao trocar de card
+document.querySelectorAll('input[type="radio"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    document.querySelectorAll('.card.default-active').forEach(card => {
+      card.classList.remove('default-active');
+    });
+  });
+});
+
+// Adiciona o evento de clique para alternar o overlay nos cards
+document.querySelectorAll('.card').forEach(card => {
+  card.addEventListener('click', function() {
+    // Verifica se o card já está com o overlay visível
+    const isActive = card.classList.contains('active');
+    
+    // Se o card não está ativo, adiciona a classe 'active'
+    if (!isActive) {
+      // Remove o overlay de todos os cards
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+    }
+  });
+});
+
+// Ativa o overlay do primeiro card automaticamente
+document.querySelectorAll('.card')[0].classList.add('active');
